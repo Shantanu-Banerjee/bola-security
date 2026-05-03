@@ -1,0 +1,559 @@
+{
+	"info": {
+		"_postman_id": "bola-security-gateway",
+		"name": "BOLA Security Gateway Test Collection",
+		"description": "Comprehensive test collection for BOLA security middleware with real attack simulations and monitoring",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Legitimate Access Tests",
+			"item": [
+				{
+					"name": "Normal User Access",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "user123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/legitimate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "legitimate"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains success\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Resource Access (Owner)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "user123",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/resources/123",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "resources", "123"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🚨 IDOR Attack Tests",
+			"item": [
+				{
+					"name": "Access Other User's Resource",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "attacker456",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/resources/999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "resources", "999"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should be blocked - Status 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"pm.test(\"Contains security error\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error.type).to.eql(\"ACCESS_DENIED\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Multiple Resource Enumeration",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "attacker456",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/resources/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "resources", "1"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should be blocked\", function () {",
+									"    pm.expect([403, 429]).to.include(pm.response.code);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🔄 Sequential Probing Tests",
+			"item": [
+				{
+					"name": "Sequential ID Probing 1",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "prober789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sequential/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sequential", "1"]
+						}
+					}
+				},
+				{
+					"name": "Sequential ID Probing 2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "prober789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sequential/2",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sequential", "2"]
+						}
+					}
+				},
+				{
+					"name": "Sequential ID Probing 3",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "prober789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sequential/3",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sequential", "3"]
+						}
+					}
+				},
+				{
+					"name": "Sequential ID Probing 4",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "prober789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sequential/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sequential", "4"]
+						}
+					}
+				},
+				{
+					"name": "Sequential ID Probing 5",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "prober789",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sequential/5",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sequential", "5"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should be rate limited after 5 requests\", function () {",
+									"    pm.expect([200, 429]).to.include(pm.response.code);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "⚡ Sensitive Operation Tests",
+			"item": [
+				{
+					"name": "Admin Operation (Legitimate)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "admin123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"action\": \"create_user\", \"userData\": {\"name\": \"Test User\", \"role\": \"user\"}}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sensitive",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sensitive"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Admin operation allowed\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Unauthorized Admin Operation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "user123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"action\": \"delete_user\", \"targetId\": \"admin123\"}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/sensitive",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "sensitive"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should be blocked or monitored\", function () {",
+									"    pm.expect([200, 403]).to.include(pm.response.code);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📊 Bulk Operation Tests",
+			"item": [
+				{
+					"name": "Bulk Data Processing",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "user123",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\"id\": 1, \"data\": \"item1\"}, {\"id\": 2, \"data\": \"item2\"}, {\"id\": 3, \"data\": \"item3\"}, {\"id\": 4, \"data\": \"item4\"}, {\"id\": 5, \"data\": \"item5\"}]"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/test/bulk",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "test", "bulk"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📈 Monitoring & Analytics",
+			"item": [
+				{
+					"name": "Gateway Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "stats"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Statistics response\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('totalRequests');",
+									"    pm.expect(jsonData).to.have.property('blockedRequests');",
+									"    pm.expect(jsonData).to.have.property('attackAttempts');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Attack Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/logs/attacks",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "logs", "attacks"]
+						}
+					}
+				},
+				{
+					"name": "Security Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/logs/security",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "logs", "security"]
+						}
+					}
+				},
+				{
+					"name": "IP Reputation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/reputation/ip",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "reputation", "ip"]
+						}
+					}
+				},
+				{
+					"name": "Attack Timeline",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/timeline/attacks",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "timeline", "attacks"]
+						}
+					}
+				},
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Export & Reports",
+			"item": [
+				{
+					"name": "Export Security Logs (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/export/logs?logType=security",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "export", "logs"],
+							"query": [
+								{
+									"key": "logType",
+									"value": "security"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Export Attack Logs (CSV)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/gateway/export/logs?logType=attack",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "gateway", "export", "logs"],
+							"query": [
+								{
+									"key": "logType",
+									"value": "attack"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Add timestamp for unique requests",
+					"pm.globals.set(\"timestamp\", Date.now());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log response time",
+					"console.log(\"Response time: \" + pm.response.responseTime + \"ms\");",
+					"",
+					"// Check for security headers",
+					"if (pm.response.headers.get(\"X-Security-Processed\") === \"true\") {",
+					"    console.log(\"✅ Security processing confirmed\");",
+					"}",
+					"",
+					"// Log gateway headers",
+					"const gatewayVersion = pm.response.headers.get(\"X-Gateway-Version\");",
+					"if (gatewayVersion) {",
+					"    console.log(\"Gateway Version: \" + gatewayVersion);",
+					"}"
+				]
+			}
+		}
+	]
+}

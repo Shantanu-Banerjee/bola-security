@@ -1,0 +1,102 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: bola-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bola_db}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me-root}
+      MYSQL_USER: ${MYSQL_USER:-bola_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change-me-app}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: bola-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: bola-security
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-bola_db}
+      DB_USERNAME: ${MYSQL_USER:-bola_app}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-change-me-app}
+      DDL_AUTO: validate
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_ISSUER: ${JWT_ISSUER:-bola-security}
+      CACHE_TYPE: redis
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      BOLA_REDIS_RATE_LIMITING_ENABLED: "true"
+      BOLA_ENUMERATION_THRESHOLD: 5
+      BOLA_ENUMERATION_WINDOW_SECONDS: 10
+      BOLA_DEPARTMENT_ACCESS_ENABLED: "false"
+      BOLA_BUSINESS_HOURS_ONLY: "false"
+      BOLA_BUSINESS_HOUR_START: 9
+      BOLA_BUSINESS_HOUR_END: 18
+      BOLA_BLOCK_MISSING_USER_AGENT: "true"
+      BOLA_HIGH_RISK_THRESHOLD: 80
+      BOLA_ACCOUNT_LOCK_THRESHOLD: 5
+      BOLA_SEED_DEMO_DATA: "true"
+      BOLA_SEQUENTIAL_ACCESS_THRESHOLD: 3
+      BOLA_SCOPE_USER: OWN
+      BOLA_SCOPE_MANAGER: SAME_DEPARTMENT
+      BOLA_SCOPE_ADMIN: ANY
+      BOLA_GATEWAY_API_KEY: ${BOLA_GATEWAY_API_KEY:-local-gateway-key}
+      BOLA_ALERT_SEVERITY_THRESHOLD: ${BOLA_ALERT_SEVERITY_THRESHOLD:-HIGH}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: bola-prometheus
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: bola-grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin123}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+
+volumes:
+  mysql-data:
+  grafana-data:

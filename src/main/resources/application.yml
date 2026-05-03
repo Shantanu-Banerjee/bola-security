@@ -1,0 +1,79 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:testdb}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:create-drop}
+    show-sql: ${SHOW_SQL:false}
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+    baseline-on-migrate: true
+  application:
+    name: bola-security
+  cache:
+    type: ${CACHE_TYPE:simple}
+    cache-names: userAccounts,accessPolicyDecisions
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      repositories:
+        enabled: false
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+bola:
+  security:
+    enumeration-threshold: ${BOLA_ENUMERATION_THRESHOLD:5}
+    enumeration-window-seconds: ${BOLA_ENUMERATION_WINDOW_SECONDS:10}
+    department-access-enabled: ${BOLA_DEPARTMENT_ACCESS_ENABLED:false}
+    seed-demo-data: ${BOLA_SEED_DEMO_DATA:true}
+    business-hours-only: ${BOLA_BUSINESS_HOURS_ONLY:false}
+    business-hour-start: ${BOLA_BUSINESS_HOUR_START:9}
+    business-hour-end: ${BOLA_BUSINESS_HOUR_END:18}
+    block-missing-user-agent: ${BOLA_BLOCK_MISSING_USER_AGENT:true}
+    high-risk-threshold: ${BOLA_HIGH_RISK_THRESHOLD:80}
+    account-lock-threshold: ${BOLA_ACCOUNT_LOCK_THRESHOLD:5}
+    jwt-secret: ${JWT_SECRET:mySuperSecretKeyForJWTTokenGenerationThatIsAtLeast32Characters}
+    jwt-issuer: ${JWT_ISSUER:bola-security}
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:15m}
+    refresh-token-ttl: ${JWT_REFRESH_TOKEN_TTL:7d}
+    trusted-proxies: ${TRUSTED_PROXIES:127.0.0.1,0:0:0:0:0:0:0:1,::1}
+    redis-rate-limiting-enabled: ${BOLA_REDIS_RATE_LIMITING_ENABLED:false}
+    sequential-access-threshold: ${BOLA_SEQUENTIAL_ACCESS_THRESHOLD:3}
+    gateway-api-key: ${BOLA_GATEWAY_API_KEY:}
+    alert-severity-threshold: ${BOLA_ALERT_SEVERITY_THRESHOLD:HIGH}
+    role-resource-scopes:
+      USER: ${BOLA_SCOPE_USER:OWN}
+      MANAGER: ${BOLA_SCOPE_MANAGER:SAME_DEPARTMENT}
+      ADMIN: ${BOLA_SCOPE_ADMIN:ANY}

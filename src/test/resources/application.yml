@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:bola_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: false
+  cache:
+    type: none
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+bola:
+  security:
+    enumeration-threshold: 5
+    enumeration-window-seconds: 10
+    department-access-enabled: false
+    seed-demo-data: false
+    business-hours-only: false
+    business-hour-start: 9
+    business-hour-end: 18
+    block-missing-user-agent: true
+    high-risk-threshold: 80
+    account-lock-threshold: 5
+    jwt-secret: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    jwt-issuer: bola-security-test
+    access-token-ttl: 15m
+    refresh-token-ttl: 7d
+    trusted-proxies: 127.0.0.1,0:0:0:0:0:0:0:1,::1
+    redis-rate-limiting-enabled: false
+    sequential-access-threshold: 3
+    gateway-api-key: test-gateway-key
+    alert-severity-threshold: HIGH
+    role-resource-scopes:
+      USER: OWN
+      MANAGER: OWN
+      ADMIN: ANY

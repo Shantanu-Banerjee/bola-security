@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Audit Logs | BOLA Defense</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #172033;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #d8dee9;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #f2f5f9;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+    </nav>
+    <h1>Latest Access Logs</h1>
+    <h2>Security Incidents</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Resource</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Risk</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="incident : ${incidents}">
+            <td th:text="${incident.createdAt}"></td>
+            <td th:text="${incident.username}"></td>
+            <td th:text="${incident.resourceId}"></td>
+            <td th:text="${incident.incidentType}"></td>
+            <td th:text="${incident.severity}"></td>
+            <td th:text="${incident.riskScore}"></td>
+            <td th:text="${incident.description}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Access Decision Logs</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Role</th>
+            <th>User Dept</th>
+            <th>Resource</th>
+            <th>Owner</th>
+            <th>Resource Dept</th>
+            <th>Owner Match</th>
+            <th>Same Dept</th>
+            <th>IP</th>
+            <th>Hour</th>
+            <th>Recent IDs</th>
+            <th>Risk</th>
+            <th>Result</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="log : ${logs}">
+            <td th:text="${log.timestamp}"></td>
+            <td th:text="${log.username}"></td>
+            <td th:text="${log.userRole}"></td>
+            <td th:text="${log.userDepartment}"></td>
+            <td th:text="${log.resourceId}"></td>
+            <td th:text="${log.resourceOwnerId}"></td>
+            <td th:text="${log.resourceDepartment}"></td>
+            <td th:text="${log.ownerMatch}"></td>
+            <td th:text="${log.sameDepartment}"></td>
+            <td th:text="${log.ipAddress}"></td>
+            <td th:text="${log.accessHour}"></td>
+            <td th:text="${log.recentDistinctResourceCount}"></td>
+            <td th:text="${log.riskScore}"></td>
+            <td th:text="${log.result}"></td>
+            <td th:text="${log.reason}"></td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

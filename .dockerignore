@@ -1,0 +1,8 @@
+target
+.git
+.idea
+.vscode
+*.iml
+.env
+mysql-data
+grafana-data

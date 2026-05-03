@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login | BOLA Defense</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #172033;
+        }
+        form {
+            max-width: 360px;
+        }
+        label {
+            display: block;
+            margin-top: 14px;
+        }
+        input, button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .error {
+            color: #b42318;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>BOLA Defense Login</h1>
+    <p th:if="${param.error}" class="error">Invalid username or password.</p>
+    <form method="post" th:action="@{/doLogin}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</main>
+</body>
+</html>
