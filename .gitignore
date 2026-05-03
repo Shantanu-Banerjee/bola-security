@@ -1,13 +1,38 @@
-HELP.md
+# =========================
+# BUILD FILES
+# =========================
 target/
+build/
+
+# =========================
+# ENV FILES
+# =========================
 .env
 .env.*
 !.env.example
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
-### STS ###
+# =========================
+# LOG FILES
+# =========================
+*.log
+logs/
+
+# =========================
+# MAVEN
+# =========================
+.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# IDE - IntelliJ
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# =========================
+# IDE - Eclipse / STS
+# =========================
 .apt_generated
 .classpath
 .factorypath
@@ -16,21 +41,27 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# =========================
+# IDE - VS Code
+# =========================
+.vscode/
 
-### NetBeans ###
+# =========================
+# NETBEANS
+# =========================
 /nbproject/private/
 /nbbuild/
-/dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# MISC
+# =========================
+HELP.md
+__MACOSX/
