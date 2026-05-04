@@ -3,16 +3,15 @@ package com.example.bola_security.util;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
+/**
+ * DEPRECATED: Custom JWT parsing no longer used. 
+ * JWT validation and claim extraction handled by Spring Security oauth2ResourceServer
+ * and SecurityContextHolder.getContext().getAuthentication() -> JwtAuthenticationToken.getToken().getClaim("uid").
+ * Use JwtTokenService for server-side token operations.
+ */
+@Deprecated
 @Component
 public class JwtUtil {
 
-    public String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        return header != null ? header.replace("Bearer ", "") : null;
-    }
-
-    public String extractUserId(String token) {
-        // TEMP: Replace with real JWT parsing later
-        return token;
-    }
+    // Methods disabled - use SecurityContext
 }
